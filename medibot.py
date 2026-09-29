@@ -26,7 +26,7 @@ def load_llm():
         return ChatGoogleGenerativeAI(
         model="gemini-3.6-flash",
         temperature=0.5,
-        max_output_tokens=512,
+        max_output_tokens=2048,
         google_api_key=os.environ.get("GOOGLE_API_KEY")
     )
 
@@ -91,7 +91,13 @@ def main():
                         st.caption(doc.page_content.strip()[:300] + "...")
 
         except Exception as e:
-            st.error(f"Error: {str(e)}")
+            msg = str(e)
+            if "RESOURCE_EXHAUSTED" in msg or "429" in msg:
+                st.warning("This live demo has reached its free daily limit for the Gemini API. Please try again tomorrow.")
+            elif "UNAVAILABLE" in msg or "503" in msg:
+                st.warning("The Gemini model is under high demand right now. Please try again in a minute.")
+            else:
+                st.error(f"Error: {msg}")
 
 if __name__ == "__main__":
     main()     

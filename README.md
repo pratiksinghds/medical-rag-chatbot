@@ -26,5 +26,4 @@ An end-to-end Retrieval-Augmented Generation (RAG) assistant designed to parse u
 ```bash
 git clone [https://github.com/pratiksinghds/medical-rag-chatbot.git](https://github.com/pratiksinghds/medical-rag-chatbot.git)
 cd medical-rag-chatbot
-pipenv install
-pipenv shell
+pip install -r requirements.txt
