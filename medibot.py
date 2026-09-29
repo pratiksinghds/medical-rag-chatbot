@@ -1,11 +1,12 @@
 import streamlit as st
 import os
+import re
 from dotenv import load_dotenv
 load_dotenv()
 
 from langchain_huggingface import HuggingFaceEmbeddings
 from langchain_classic.chains import RetrievalQA
-from langchain_google_genai import ChatGoogleGenerativeAI
+from langchain_groq import ChatGroq
 from langchain_community.vectorstores import FAISS
 from langchain_core.prompts import PromptTemplate
 
@@ -23,11 +24,11 @@ def set_custom_prompt(custom_prompt_template):
 
 
 def load_llm():
-        return ChatGoogleGenerativeAI(
-        model="gemini-3.6-flash",
+        return ChatGroq(
+        model=os.environ.get("GROQ_MODEL", "qwen/qwen3.8-27b"),
         temperature=0.5,
-        max_output_tokens=2048,
-        google_api_key=os.environ.get("GOOGLE_API_KEY")
+        max_tokens=2048,
+        api_key=os.environ.get("GROQ_API_KEY")
     )
 
 def main():
@@ -56,7 +57,7 @@ def main():
                 Start the answer directly. No small talk please.
                 """
         
-        #setup Gemini LLM
+        #setup Groq LLM
         llm=load_llm()
 
 
@@ -75,7 +76,8 @@ def main():
      
             response = qa_chain.invoke({"query": prompt})
 
-            result = response["result"]
+            # Strip any <think>...</think> reasoning some models emit before the answer
+            result = re.sub(r"<think>.*?</think>", "", response["result"], flags=re.DOTALL).strip()
             source_docs = response.get("source_documents", [])
 
             # Display answer
@@ -92,10 +94,10 @@ def main():
 
         except Exception as e:
             msg = str(e)
-            if "RESOURCE_EXHAUSTED" in msg or "429" in msg:
-                st.warning("This live demo has reached its free daily limit for the Gemini API. Please try again tomorrow.")
-            elif "UNAVAILABLE" in msg or "503" in msg:
-                st.warning("The Gemini model is under high demand right now. Please try again in a minute.")
+            if "rate_limit" in msg or "429" in msg:
+                st.warning("This live demo is receiving a lot of requests right now. Please try again in a minute.")
+            elif "503" in msg or "over capacity" in msg:
+                st.warning("The model is under high demand right now. Please try again in a minute.")
             else:
                 st.error(f"Error: {msg}")
 

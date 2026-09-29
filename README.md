@@ -12,7 +12,7 @@ An end-to-end Retrieval-Augmented Generation (RAG) assistant designed to parse u
 ---
 
 ## 🏗️ Architecture & Tech Stack
-* **LLM Engine:** Google Gemini API (`gemini-1.5-flash`) via `langchain-google-genai`
+* **LLM Engine:** Groq (`qwen/qwen3.8-27b`, configurable via `GROQ_MODEL`) via `langchain-groq`
 * **Embeddings:** `sentence-transformers/all-MiniLM-L6-v2`
 * **Vector Index:** FAISS (Facebook AI Similarity Search)
 * **Frameworks:** LangChain (`RetrievalQA`, custom prompt engineering)

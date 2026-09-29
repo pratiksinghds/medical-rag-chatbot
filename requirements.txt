@@ -6,7 +6,7 @@ langchain
 langchain-classic
 langchain-community
 langchain-core
-langchain-google-genai
+langchain-groq
 langchain-huggingface
 sentence-transformers
 faiss-cpu
